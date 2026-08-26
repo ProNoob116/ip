@@ -1,5 +1,9 @@
 import java.util.Scanner;
 
+/**
+ * The Wallis chatbot application.
+ * Handles user inputs for managing a task list.
+ */
 public class Wallis {
     public static void main(String[] args) {
         String botName = "Wallis";

@@ -1,3 +1,9 @@
+
+/**
+ * Represents a task in the Wallis chatbot.
+ * Tracks the description and completion status.
+ */
+
 public class Task {
     protected String description;
     protected boolean isDone;
