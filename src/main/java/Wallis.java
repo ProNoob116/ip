@@ -1,13 +1,7 @@
+import java.util.Scanner;
+
 public class Wallis {
     public static void main(String[] args) {
-        String logo = " ____        _        \n"
-                + "|  _ \\ _   _| | _____ \n"
-                + "| | | | | | | |/ / _ \\\n"
-                + "| |_| | |_| |   <  __/\n"
-                + "|____/ \\__,_|_|\\_\\___|\n";
-        System.out.println("Hello from\n" + logo);
-        
-        // --- LEVEL 0: Rename, Greet, Exit ---
         String botName = "Wallis";
         
         // Greet
@@ -16,8 +10,27 @@ public class Wallis {
         System.out.println(" What can I do for you?");
         System.out.println("____________________________________________________________");
         
+        // Echo loop
+        Scanner scanner = new Scanner(System.in);
+        String userInput;
+        
+        while (true) {
+            userInput = scanner.nextLine();
+            
+            if (userInput.equals("bye")) {
+                break;
+            }
+            
+            System.out.println("____________________________________________________________");
+            System.out.println(" " + userInput);
+            System.out.println("____________________________________________________________");
+        }
+        
         // Exit
+        System.out.println("____________________________________________________________");
         System.out.println(" Bye. Hope to see you again soon!");
         System.out.println("____________________________________________________________");
+        
+        scanner.close();
     }
 }
