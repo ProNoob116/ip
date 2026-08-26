@@ -10,7 +10,10 @@ public class Wallis {
         System.out.println(" What can I do for you?");
         System.out.println("____________________________________________________________");
         
-        // Echo loop
+        // Task memory
+        String[] tasks = new String[100];
+        int taskCount = 0;
+        
         Scanner scanner = new Scanner(System.in);
         String userInput;
         
@@ -19,11 +22,20 @@ public class Wallis {
             
             if (userInput.equals("bye")) {
                 break;
+            } else if (userInput.equals("list")) {
+                System.out.println("____________________________________________________________");
+                for (int i = 0; i < taskCount; i++) {
+                    System.out.println(" " + (i + 1) + ". " + tasks[i]);
+                }
+                System.out.println("____________________________________________________________");
+            } else {
+                tasks[taskCount] = userInput;
+                taskCount++;
+                
+                System.out.println("____________________________________________________________");
+                System.out.println(" added: " + userInput);
+                System.out.println("____________________________________________________________");
             }
-            
-            System.out.println("____________________________________________________________");
-            System.out.println(" " + userInput);
-            System.out.println("____________________________________________________________");
         }
         
         // Exit
