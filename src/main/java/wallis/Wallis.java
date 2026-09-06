@@ -1,3 +1,4 @@
+package wallis;
 import java.util.Scanner;
 
 /**

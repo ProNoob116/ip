@@ -1,3 +1,4 @@
+package wallis;
 
 /**
  * Represents a task in the Wallis chatbot.
