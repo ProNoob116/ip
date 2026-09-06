@@ -1,3 +1,5 @@
+package wallis;
+
 /**
  * Represents a task that starts and ends at specific times.
  */
