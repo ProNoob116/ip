@@ -2,6 +2,9 @@ package wallis;
 
 import java.util.Scanner;
 import java.util.ArrayList;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 
 /**
  * The Wallis chatbot application.
@@ -9,8 +12,11 @@ import java.util.ArrayList;
  */
 public class Wallis {
     private static ArrayList<Task> tasks = new ArrayList<>();
+    private static final String FILE_PATH = "./data/wallis.txt";
 
     public static void main(String[] args) {
+        loadTasks(); // Load data from hard drive on startup
+
         printLine();
         System.out.println(" Hello! I'm Wallis");
         System.out.println(" What can I do for you?");
@@ -57,6 +63,62 @@ public class Wallis {
         scanner.close();
     }
 
+    private static void loadTasks() {
+        try {
+            File file = new File(FILE_PATH);
+            if (!file.exists()) {
+                file.getParentFile().mkdirs(); // Create the /data/ folder if missing
+                file.createNewFile();
+                return;
+            }
+            Scanner fileScanner = new Scanner(file);
+            while (fileScanner.hasNext()) {
+                String line = fileScanner.nextLine();
+                if (line.length() < 7) continue;
+                String type = line.substring(1, 2);
+                boolean isDone = line.substring(4, 5).equals("X");
+                String rest = line.substring(7);
+
+                if (type.equals("T")) {
+                    Todo t = new Todo(rest);
+                    if (isDone) t.markAsDone();
+                    tasks.add(t);
+                } else if (type.equals("D")) {
+                    int byIndex = rest.lastIndexOf(" (by: ");
+                    String desc = rest.substring(0, byIndex);
+                    String by = rest.substring(byIndex + 6, rest.length() - 1);
+                    Deadline d = new Deadline(desc, by);
+                    if (isDone) d.markAsDone();
+                    tasks.add(d);
+                } else if (type.equals("E")) {
+                    int fromIndex = rest.lastIndexOf(" (from: ");
+                    int toIndex = rest.lastIndexOf(" to: ");
+                    String desc = rest.substring(0, fromIndex);
+                    String from = rest.substring(fromIndex + 8, toIndex);
+                    String to = rest.substring(toIndex + 5, rest.length() - 1);
+                    Event e = new Event(desc, from, to);
+                    if (isDone) e.markAsDone();
+                    tasks.add(e);
+                }
+            }
+            fileScanner.close();
+        } catch (Exception e) {
+            System.out.println("Error loading tasks from file.");
+        }
+    }
+
+    private static void saveTasks() {
+        try {
+            FileWriter fw = new FileWriter(FILE_PATH);
+            for (int i = 0; i < tasks.size(); i++) {
+                fw.write(tasks.get(i).toString() + "\n"); // Save in standard string format
+            }
+            fw.close();
+        } catch (IOException e) {
+            System.out.println("Error saving tasks to file.");
+        }
+    }
+
     private static void printLine() {
         System.out.println("____________________________________________________________");
     }
@@ -91,6 +153,7 @@ public class Wallis {
             }
             System.out.println("   " + tasks.get(index).toString());
             printLine();
+            saveTasks(); // Save change to hard drive
         } catch (NumberFormatException e) {
             throw new WallisException("OOPS!!! The task number must be a valid integer.");
         }
@@ -112,6 +175,7 @@ public class Wallis {
             System.out.println("   " + removedTask.toString());
             System.out.println(" Now you have " + tasks.size() + " tasks in the list.");
             printLine();
+            saveTasks(); // Save change to hard drive
         } catch (NumberFormatException e) {
             throw new WallisException("OOPS!!! The task number must be a valid integer.");
         }
@@ -159,5 +223,6 @@ public class Wallis {
         System.out.println("   " + tasks.get(tasks.size() - 1).toString());
         System.out.println(" Now you have " + tasks.size() + " tasks in the list.");
         printLine();
+        saveTasks(); // Save change to hard drive
     }
 }
