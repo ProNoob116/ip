@@ -1,13 +1,14 @@
 package wallis;
+
 import java.util.Scanner;
+import java.util.ArrayList;
 
 /**
  * The Wallis chatbot application.
  * Handles user inputs for managing different types of tasks.
  */
 public class Wallis {
-    private static Task[] tasks = new Task[100];
-    private static int taskCount = 0;
+    private static ArrayList<Task> tasks = new ArrayList<>();
 
     public static void main(String[] args) {
         printLine();
@@ -32,6 +33,8 @@ public class Wallis {
                     markTask(userInput, true);
                 } else if (userInput.startsWith("unmark")) {
                     markTask(userInput, false);
+                } else if (userInput.startsWith("delete")) {
+                    deleteTask(userInput);
                 } else if (userInput.startsWith("todo")) {
                     addTodo(userInput);
                 } else if (userInput.startsWith("deadline")) {
@@ -61,8 +64,8 @@ public class Wallis {
     private static void printList() {
         printLine();
         System.out.println(" Here are the tasks in your list:");
-        for (int i = 0; i < taskCount; i++) {
-            System.out.println(" " + (i + 1) + "." + tasks[i].toString());
+        for (int i = 0; i < tasks.size(); i++) {
+            System.out.println(" " + (i + 1) + "." + tasks.get(i).toString());
         }
         printLine();
     }
@@ -74,19 +77,40 @@ public class Wallis {
         }
         try {
             int index = Integer.parseInt(parts[1]) - 1;
-            if (index < 0 || index >= taskCount) {
+            if (index < 0 || index >= tasks.size()) {
                 throw new WallisException("OOPS!!! That task number does not exist.");
             }
             if (isDone) {
-                tasks[index].markAsDone();
+                tasks.get(index).markAsDone();
                 printLine();
                 System.out.println(" Nice! I've marked this task as done:");
             } else {
-                tasks[index].unmarkAsDone();
+                tasks.get(index).unmarkAsDone();
                 printLine();
                 System.out.println(" OK, I've marked this task as not done yet:");
             }
-            System.out.println("   " + tasks[index].toString());
+            System.out.println("   " + tasks.get(index).toString());
+            printLine();
+        } catch (NumberFormatException e) {
+            throw new WallisException("OOPS!!! The task number must be a valid integer.");
+        }
+    }
+
+    private static void deleteTask(String input) throws WallisException {
+        String[] parts = input.split(" ");
+        if (parts.length < 2) {
+            throw new WallisException("OOPS!!! Please provide a task number to delete.");
+        }
+        try {
+            int index = Integer.parseInt(parts[1]) - 1;
+            if (index < 0 || index >= tasks.size()) {
+                throw new WallisException("OOPS!!! That task number does not exist.");
+            }
+            Task removedTask = tasks.remove(index);
+            printLine();
+            System.out.println(" Noted. I've removed this task:");
+            System.out.println("   " + removedTask.toString());
+            System.out.println(" Now you have " + tasks.size() + " tasks in the list.");
             printLine();
         } catch (NumberFormatException e) {
             throw new WallisException("OOPS!!! The task number must be a valid integer.");
@@ -98,7 +122,7 @@ public class Wallis {
             throw new WallisException("OOPS!!! The description of a todo cannot be empty.");
         }
         String description = input.substring(5).trim();
-        tasks[taskCount] = new Todo(description);
+        tasks.add(new Todo(description));
         confirmAddition();
     }
 
@@ -111,7 +135,7 @@ public class Wallis {
         }
         String content = input.substring(9).trim();
         String[] parts = content.split(" /by ");
-        tasks[taskCount] = new Deadline(parts[0], parts[1]);
+        tasks.add(new Deadline(parts[0], parts[1]));
         confirmAddition();
     }
 
@@ -125,16 +149,15 @@ public class Wallis {
         String content = input.substring(6).trim();
         String[] parts = content.split(" /from ");
         String[] times = parts[1].split(" /to ");
-        tasks[taskCount] = new Event(parts[0], times[0], times[1]);
+        tasks.add(new Event(parts[0], times[0], times[1]));
         confirmAddition();
     }
 
     private static void confirmAddition() {
         printLine();
         System.out.println(" Got it. I've added this task:");
-        System.out.println("   " + tasks[taskCount].toString());
-        taskCount++;
-        System.out.println(" Now you have " + taskCount + " tasks in the list.");
+        System.out.println("   " + tasks.get(tasks.size() - 1).toString());
+        System.out.println(" Now you have " + tasks.size() + " tasks in the list.");
         printLine();
     }
 }
