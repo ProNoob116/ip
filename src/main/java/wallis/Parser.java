@@ -17,6 +17,8 @@ public class Parser {
             addDeadline(userInput, tasks, ui, storage);
         } else if (userInput.startsWith("event")) {
             addEvent(userInput, tasks, ui, storage);
+        } else if (userInput.startsWith("find")) {
+            findTask(userInput, tasks, ui);
         } else {
             throw new WallisException("OOPS!!! I'm sorry, but I don't know what that means :-(");
         }
@@ -27,6 +29,32 @@ public class Parser {
         System.out.println(" Here are the tasks in your list:");
         for (int i = 0; i < tasks.getSize(); i++) {
             System.out.println(" " + (i + 1) + "." + tasks.getTask(i).toString());
+        }
+        ui.showLine();
+    }
+
+    private static void findTask(String input, TaskList tasks, Ui ui) throws WallisException {
+        if (input.trim().equals("find")) {
+            throw new WallisException("OOPS!!! The search keyword cannot be empty.");
+        }
+        
+        String keyword = input.substring(5).trim();
+        if (keyword.isEmpty()) {
+            throw new WallisException("OOPS!!! The search keyword cannot be empty.");
+        }
+        
+        ui.showLine();
+        System.out.println(" Here are the matching tasks in your list:");
+        int count = 1;
+        for (int i = 0; i < tasks.getSize(); i++) {
+            Task task = tasks.getTask(i);
+            if (task.toString().contains(keyword)) {
+                System.out.println(" " + count + "." + task.toString());
+                count++;
+            }
+        }
+        if (count == 1) {
+            System.out.println(" No matching tasks found.");
         }
         ui.showLine();
     }
