@@ -1,7 +1,5 @@
 package wallis;
 
-import java.util.ArrayList;
-
 /**
  * The Wallis chatbot application.
  * Handles user inputs for managing different types of tasks.
@@ -9,17 +7,17 @@ import java.util.ArrayList;
 public class Wallis {
     private static Ui ui;
     private static Storage storage;
-    private static ArrayList<Task> tasks;
+    private static TaskList tasks;
 
     public static void main(String[] args) {
         ui = new Ui();
         storage = new Storage("./data/wallis.txt");
         
         try {
-            tasks = storage.load();
+            tasks = new TaskList(storage.load());
         } catch (WallisException e) {
             ui.showLoadingError();
-            tasks = new ArrayList<>();
+            tasks = new TaskList();
         }
 
         ui.showWelcome();
@@ -64,8 +62,8 @@ public class Wallis {
     private static void printList() {
         ui.showLine();
         System.out.println(" Here are the tasks in your list:");
-        for (int i = 0; i < tasks.size(); i++) {
-            System.out.println(" " + (i + 1) + "." + tasks.get(i).toString());
+        for (int i = 0; i < tasks.getSize(); i++) {
+            System.out.println(" " + (i + 1) + "." + tasks.getTask(i).toString());
         }
         ui.showLine();
     }
@@ -77,21 +75,21 @@ public class Wallis {
         }
         try {
             int index = Integer.parseInt(parts[1]) - 1;
-            if (index < 0 || index >= tasks.size()) {
+            if (index < 0 || index >= tasks.getSize()) {
                 throw new WallisException("OOPS!!! That task number does not exist.");
             }
             if (isDone) {
-                tasks.get(index).markAsDone();
+                tasks.getTask(index).markAsDone();
                 ui.showLine();
                 System.out.println(" Nice! I've marked this task as done:");
             } else {
-                tasks.get(index).unmarkAsDone();
+                tasks.getTask(index).unmarkAsDone();
                 ui.showLine();
                 System.out.println(" OK, I've marked this task as not done yet:");
             }
-            System.out.println("   " + tasks.get(index).toString());
+            System.out.println("   " + tasks.getTask(index).toString());
             ui.showLine();
-            storage.save(tasks); 
+            storage.save(tasks.getTasks()); 
         } catch (NumberFormatException e) {
             throw new WallisException("OOPS!!! The task number must be a valid integer.");
         }
@@ -104,16 +102,16 @@ public class Wallis {
         }
         try {
             int index = Integer.parseInt(parts[1]) - 1;
-            if (index < 0 || index >= tasks.size()) {
+            if (index < 0 || index >= tasks.getSize()) {
                 throw new WallisException("OOPS!!! That task number does not exist.");
             }
-            Task removedTask = tasks.remove(index);
+            Task removedTask = tasks.removeTask(index);
             ui.showLine();
             System.out.println(" Noted. I've removed this task:");
             System.out.println("   " + removedTask.toString());
-            System.out.println(" Now you have " + tasks.size() + " tasks in the list.");
+            System.out.println(" Now you have " + tasks.getSize() + " tasks in the list.");
             ui.showLine();
-            storage.save(tasks); 
+            storage.save(tasks.getTasks()); 
         } catch (NumberFormatException e) {
             throw new WallisException("OOPS!!! The task number must be a valid integer.");
         }
@@ -124,7 +122,7 @@ public class Wallis {
             throw new WallisException("OOPS!!! The description of a todo cannot be empty.");
         }
         String description = input.substring(5).trim();
-        tasks.add(new Todo(description));
+        tasks.addTask(new Todo(description));
         confirmAddition();
     }
 
@@ -137,7 +135,7 @@ public class Wallis {
         }
         String content = input.substring(9).trim();
         String[] parts = content.split(" /by ");
-        tasks.add(new Deadline(parts[0], parts[1]));
+        tasks.addTask(new Deadline(parts[0], parts[1]));
         confirmAddition();
     }
 
@@ -151,16 +149,16 @@ public class Wallis {
         String content = input.substring(6).trim();
         String[] parts = content.split(" /from ");
         String[] times = parts[1].split(" /to ");
-        tasks.add(new Event(parts[0], times[0], times[1]));
+        tasks.addTask(new Event(parts[0], times[0], times[1]));
         confirmAddition();
     }
 
     private static void confirmAddition() throws WallisException {
         ui.showLine();
         System.out.println(" Got it. I've added this task:");
-        System.out.println("   " + tasks.get(tasks.size() - 1).toString());
-        System.out.println(" Now you have " + tasks.size() + " tasks in the list.");
+        System.out.println("   " + tasks.getTask(tasks.getSize() - 1).toString());
+        System.out.println(" Now you have " + tasks.getSize() + " tasks in the list.");
         ui.showLine();
-        storage.save(tasks); 
+        storage.save(tasks.getTasks()); 
     }
 }
