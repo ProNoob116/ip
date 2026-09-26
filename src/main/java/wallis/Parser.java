@@ -2,6 +2,16 @@ package wallis;
 
 public class Parser {
 
+    /**
+     * Parses the user's input command and executes the corresponding operations.
+     *
+     * @param userInput The raw string input entered by the user.
+     * @param tasks The TaskList to modify.
+     * @param ui The Ui instance for displaying output.
+     * @param storage The Storage instance for saving data.
+     * @throws WallisException If the user command is invalid or improperly formatted.
+     */
+
     public static void parseAndExecute(String userInput, TaskList tasks, Ui ui, Storage storage) throws WallisException {
         if (userInput.equals("list")) {
             printList(tasks, ui);
